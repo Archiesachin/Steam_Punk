@@ -48,5 +48,4 @@ Space bar for shooting lasers
 
 <br>
 
-## **Working video 📹**
-<!-- add your working video over here -->
+
