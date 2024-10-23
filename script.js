@@ -1,35 +1,31 @@
-window.addEventListener('load', function(){
-  //canvas setup 
+window.addEventListener('load', function() {
+  // canvas setup 
   const canvas = document.getElementById('canvas1'); 
   const ctx = canvas.getContext('2d');
   canvas.width = 1500; 
   canvas.height = 500; 
 
+  let gamePaused = false;
+  let gameStarted = false;
 
-  class InputHandler{
-    constructor(game){
+  class InputHandler {
+    constructor(game) {
       this.game = game; 
-      window.addEventListener('keydown' , e =>{
-        if((  (e.key === 'ArrowUp') ||
-              (e.key === 'ArrowDown')
-      )&& this.game.keys.indexOf(e.key) === -1){
-          this.game.keys.push(e.key)
-        }else if(e.key === ' '){
-          this.game.player.shootTop()
-        }else if(e.key === 'd'){
+      window.addEventListener('keydown', e => {
+        if ((e.key === 'ArrowUp' || e.key === 'ArrowDown') && this.game.keys.indexOf(e.key) === -1) {
+          this.game.keys.push(e.key);
+        } else if (e.key === ' ') {
+          this.game.player.shootTop();
+        } else if (e.key === 'd') {
           this.game.debug = !this.game.debug; 
         }
-       
-      }); 
-      window.addEventListener('keyup' , e=>{
-        if(this.game.keys.indexOf(e.key) > -1){
+      });
+      window.addEventListener('keyup', e => {
+        if (this.game.keys.indexOf(e.key) > -1) {
           this.game.keys.splice(this.game.keys.indexOf(e.key), 1); 
-          
         }
-        
-      })
+      });
     }
-
   }
   class Projectile{
     constructor(game, x, y){
@@ -367,38 +363,36 @@ window.addEventListener('load', function(){
   }
 
 
-  class Game{
-    constructor(width, height){
+  class Game {
+    constructor(width, height) {
       this.width = width;
-      this.height = height; 
-      this.background = new Background(this);
+      this.height = height;
       this.player = new Player(this); 
       this.input = new InputHandler(this);
-      this. ui = new UI(this);
+      this.ui = new UI(this);
+      this.background = new Background(this);  // Include background
       this.keys = [];
       this.enemies = [];
       this.particles = [];
       this.enemyTimer = 0;
-      this.enemyInterval = 1000; 
-      this.ammo = 20; 
-      this.maxAmmo = 50; 
-      this.ammoTimer = 0; 
-      this.ammoInterval = 500;
-      this.gameOver = false; 
-      this.score = 0; 
-      this.winningScore = 100; 
-      this.gameTime = 0; 
-      this.timeLimit = 50000; 
-      this.speed = 1; 
-      this.debug = false
-
+      this.enemyInterval = 1000;    // Interval for spawning enemies
+      this.ammo = 20;               // Player ammo count
+      this.maxAmmo = 50;            // Maximum ammo the player can have
+      this.ammoTimer = 0;           // Timer for replenishing ammo
+      this.ammoInterval = 500;      // Time interval for ammo replenishment
+      this.gameTime = 0;
+      this.timeLimit = 50000;       // 50 seconds game limit
+      this.gameOver = false;
+      this.score = 0;
+      this.winningScore = 100;      // Winning score for the game
+      this.speed = 1;
+      this.debug = false;           // Debug mode for visualizing hitboxes
     }
-    update(deltaTime){
-      if(!this.gameOver) this.gameTime += deltaTime; 
-      if(this.gameTime >this.timeLimit) this.gameOver = true; 
-      this.background.update()
-      this.background.layer4.update()
-      this.player.update(deltaTime);
+    update(deltaTime) {
+      if (!this.gameOver && !gamePaused) {
+        this.gameTime += deltaTime;
+        if (this.gameTime > this.timeLimit) this.gameOver = true;
+        this.player.update(deltaTime);
 
       if(this.ammoTimer > this.ammoInterval){
         if(this.ammo < this.maxAmmo) this.ammo ++; 
@@ -447,6 +441,7 @@ window.addEventListener('load', function(){
         this.enemyTimer += deltaTime; 
       }
     }
+  }
     draw(context){
       this.background.draw(context)
       this.ui.draw(context)
@@ -477,16 +472,55 @@ window.addEventListener('load', function(){
   }
 
   const game = new Game(canvas.width, canvas.height);
-  let lastTime = 0; 
-  //animation loop
-  function animate(timeStamp){
-    const deltaTime = timeStamp - lastTime
-    lastTime = timeStamp; 
-    ctx.clearRect(0,0,canvas.width, canvas.height)
-    game.update(deltaTime); 
-    game.draw(ctx);
-    requestAnimationFrame(animate)
-  } 
+  let lastTime = 0;
 
+  function animate(timeStamp) {
+    const deltaTime = timeStamp - lastTime;
+    lastTime = timeStamp;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    game.update(deltaTime);
+    game.draw(ctx);
+    if (gameStarted && !gamePaused) requestAnimationFrame(animate);
+  }
+  const startBtn = document.getElementById('startBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const resumeBtn = document.getElementById('resumeBtn');
+  const rulesBtn = document.getElementById('rulesBtn');
+  const rulesPopup = document.getElementById('rulesPopup');
+  const closePopup = document.getElementById('closePopup');
+
+  startBtn.addEventListener('click', () => {
+    if (!gameStarted) {
+      gameStarted = true;
+      animate(0); // Start the game loop
+    }
+  });
+
+  stopBtn.addEventListener('click', () => {
+    gamePaused = true; // Stop the game loop
+  });
+
+  resumeBtn.addEventListener('click', () => {
+    if (gamePaused) {
+      gamePaused = false; 
+      requestAnimationFrame(animate); // Resume the game loop
+    }
+  });
+
+  rulesBtn.addEventListener('click', () => {
+    rulesPopup.style.display = 'block'; // Show rules popup
+  });
+
+  closePopup.addEventListener('click', () => {
+    rulesPopup.style.display = 'none'; // Close rules popup
+  });
+
+  window.addEventListener('click', (event) => {
+    if (event.target === rulesPopup) {
+      rulesPopup.style.display = 'none'; // Close popup if clicked outside
+    }
+  });
   animate(0);
-})
+}); 
+
+  
