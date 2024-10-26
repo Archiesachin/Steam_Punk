@@ -398,6 +398,17 @@ window.addEventListener('load', function() {
       this.speed = 1;
       this.debug = false;           // Debug mode for visualizing hitboxes
     }
+    reset() {
+      this.player = new Player(this);
+      this.keys = [];
+      this.ammo = 20;
+      this.ammoTimer = 0;
+      this.gameTime = 0;
+      this.gameOver = false;
+      this.score = 0;
+      this.enemies = [];
+      this.enemyTimer = 0;
+    }
     update(deltaTime) {
       if (!this.gameOver && !gamePaused) {
         this.gameTime += deltaTime;
@@ -452,6 +463,8 @@ window.addEventListener('load', function() {
       }
     }
   }
+  
+  
     draw(context){
       this.background.draw(context)
       this.ui.draw(context)
@@ -482,55 +495,58 @@ window.addEventListener('load', function() {
   }
 
   const game = new Game(canvas.width, canvas.height);
-  let lastTime = 0;
+let lastTime = 0;
 
-  function animate(timeStamp) {
-    const deltaTime = timeStamp - lastTime;
-    lastTime = timeStamp;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    game.update(deltaTime);
-    game.draw(ctx);
-    if (gameStarted && !gamePaused) requestAnimationFrame(animate);
+function animate(timeStamp) {
+  const deltaTime = timeStamp - lastTime;
+  lastTime = timeStamp;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  game.update(deltaTime);
+  game.draw(ctx);
+  if (gameStarted && !gamePaused) requestAnimationFrame(animate);
+}
+
+const startBtn = document.getElementById('startBtn');
+const stopBtn = document.getElementById('stopBtn');
+const resumeBtn = document.getElementById('resumeBtn');
+const rulesBtn = document.getElementById('rulesBtn');
+const rulesPopup = document.getElementById('rulesPopup');
+const closePopup = document.getElementById('closePopup');
+
+startBtn.addEventListener('click', () => {
+  game.reset(); // Reset the game state
+  if (!gameStarted) {
+    gameStarted = true;
+    animate(0); // Start the game loop
   }
-  const startBtn = document.getElementById('startBtn');
-  const stopBtn = document.getElementById('stopBtn');
-  const resumeBtn = document.getElementById('resumeBtn');
-  const rulesBtn = document.getElementById('rulesBtn');
-  const rulesPopup = document.getElementById('rulesPopup');
-  const closePopup = document.getElementById('closePopup');
+});
 
-  startBtn.addEventListener('click', () => {
-    if (!gameStarted) {
-      gameStarted = true;
-      animate(0); // Start the game loop
-    }
-  });
+stopBtn.addEventListener('click', () => {
+  gamePaused = true; // Stop the game loop
+});
 
-  stopBtn.addEventListener('click', () => {
-    gamePaused = true; // Stop the game loop
-  });
+resumeBtn.addEventListener('click', () => {
+  if (gamePaused) {
+    gamePaused = false; 
+    requestAnimationFrame(animate); // Resume the game loop
+  }
+});
 
-  resumeBtn.addEventListener('click', () => {
-    if (gamePaused) {
-      gamePaused = false; 
-      requestAnimationFrame(animate); // Resume the game loop
-    }
-  });
+rulesBtn.addEventListener('click', () => {
+  rulesPopup.style.display = 'block'; // Show rules popup
+});
 
-  rulesBtn.addEventListener('click', () => {
-    rulesPopup.style.display = 'block'; // Show rules popup
-  });
+closePopup.addEventListener('click', () => {
+  rulesPopup.style.display = 'none'; // Close rules popup
+});
 
-  closePopup.addEventListener('click', () => {
-    rulesPopup.style.display = 'none'; // Close rules popup
-  });
+window.addEventListener('click', (event) => {
+  if (event.target === rulesPopup) {
+    rulesPopup.style.display = 'none'; // Close popup if clicked outside
+  }
+});
 
-  window.addEventListener('click', (event) => {
-    if (event.target === rulesPopup) {
-      rulesPopup.style.display = 'none'; // Close popup if clicked outside
-    }
-  });
-  animate(0);
-}); 
+animate(0);
+}) 
 
   
