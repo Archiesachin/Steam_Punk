@@ -87,95 +87,85 @@ window.addEventListener('load', function() {
     }
 
   }
-  class Player {
-    constructor(game) {
-      this.game = game;
+  class Player{
+    constructor(game){
+      this.game = game; 
       this.width = 120;
-      this.height = 190;
+      this.height = 190; 
       this.x = 20;
-      this.y = 100;
-      this.frameX = 0;
+      this.y= 100;
+      this.frameX = 0; 
       this.frameY = 0;
-      this.maxFrame = 37;
+      this.maxFrame = 37; 
       this.speedY = 0;
-      this.maxSpeed = 2;
+      this.maxSpeed = 2 ;
       this.projectiles = [];
-      this.image = document.getElementById('player');
-      this.powerUp = false;
+      this.image = document.getElementById('player')
+      this.pwerUp = false; 
       this.powerTimer = 0;
-      this.powerUpLimit = 10000;
-    }
-  
-    update(deltaTime) {
-      if (this.game.keys.includes('ArrowUp')) {
-        this.speedY = -this.maxSpeed;
-      } else if (this.game.keys.includes('ArrowDown')) {
-        this.speedY = this.maxSpeed;
-      } else {
-        this.speedY = 0;
+      this.powerUpLimit = 10000; 
       }
-      this.y += this.speedY;
-  
-      // Vertical boundaries
-      if (this.y > this.game.height - this.height) {
-        this.y = this.game.height - this.height;
-      } else if (this.y < 0) {
-        this.y = 0;
-      }
-  
-      // Handle projectiles
+
+    update(deltaTime){
+      if(this.game.keys.includes('ArrowUp')) this.speedY = -this.maxSpeed; 
+      else if(this.game.keys.includes('ArrowDown')) this.speedY = this.maxSpeed;
+      else this.speedY = 0; 
+      this.y += this.speedY
+      //vertical boundaries
+      if(this.y > this.game.height - this.height) this.y = this.game.height - this.height * 0.5; 
+      else if(this.y< -this.height * 0.5) this.y = -this.height * 0.5; 
+      //handle Projectiles
       this.projectiles.forEach(projectile => {
-        projectile.update();
-      });
-      this.projectiles = this.projectiles.filter(projectile => !projectile.markedForDeletion);
-  
-      // Sprite animation
-      if (this.frameX < this.maxFrame) {
-        this.frameX++;
-      } else {
-        this.frameX = 0;
+        projectile.update()
+      })
+      this.projectiles = this.projectiles.filter(projectile => !projectile.markedForDeletion)
+      //Sprite Animation
+      if(this.frameX < this.maxFrame){
+        this.frameX++
+      }else{
+        this.frameX = 0
       }
-  
-      // Power up
-      if (this.powerUp) {
-        if (this.powerTimer > this.powerUpLimit) {
-          this.powerTimer = 0;
-          this.powerUp = false;
-          this.frameY = 0;
-        } else {
-          this.powerTimer += deltaTime;
-          this.frameY = 1;
-          this.game.ammo += 0.1;
-        }
+
+      //power up
+      if(this.powerUp){
+        if(this.powerTimer > this.powerUpLimit){
+        this.powerTimer = 0;
+        this.powerUp = false;
+        this.frameY= 0
+      } else{
+        this.powerTimer += deltaTime;
+        this.frameY = 1; 
+        this.game.ammo += 0.1; 
       }
     }
-  
-    draw(context) {
-      if (this.game.debug) context.strokeRect(this.x, this.y, this.width, this.height);
+      
+    }
+    draw(context){
+      if(this.game.debug)context.strokeRect(this.x, this.y, this.width, this.height);
       this.projectiles.forEach(projectile => {
-        projectile.draw(context);
-      });
-      context.drawImage(this.image, this.frameX * this.width, this.frameY * this.height, this.width, this.height, this.x, this.y, this.width, this.height);
+        projectile.draw(context)
+      }) 
+      context.drawImage(this.image, this.frameX *this.width, this.frameY *this.height, this.width, this.height,  this.x, this.y, this.width, this.height);
+      
     }
-  
-    shootTop() {
-      if (this.game.ammo > 0) {
-        this.projectiles.push(new Projectile(this.game, this.x + 80, this.y + 30));
-        this.game.ammo--;
+
+    shootTop(){
+      if(this.game.ammo > 0){
+        this.projectiles.push(new Projectile(this.game, this.x +80, this.y +30));
+        this.game.ammo--; 
       }
-      if (this.powerUp) this.shootBottom();
+      if(this.powerUp) this.shootBottom()
+      
     }
-  
-    shootBottom() {
-      if (this.game.ammo > 0) {
-        this.projectiles.push(new Projectile(this.game, this.x + 80, this.y + 175));
+    shootBottom(){
+      if(this.game.ammo > 0){
+        this.projectiles.push(new Projectile(this.game, this.x +80, this.y +175));
       }
     }
-  
-    enterPowerUp() {
-      this.powerTimer = 0;
-      this.powerUp = true;
-      if (this.game.ammo < this.game.maxAmmo) this.game.ammo = this.game.maxAmmo;
+    enterPowerUp(){
+      this.powerTimer = 0; 
+      this.powerUp = true; 
+      if(this.game.ammo < this.game.maxAmmo) this.game.ammo = this.game.maxAmmo; 
     }
   }
 
@@ -398,17 +388,6 @@ window.addEventListener('load', function() {
       this.speed = 1;
       this.debug = false;           // Debug mode for visualizing hitboxes
     }
-    reset() {
-      this.player = new Player(this);
-      this.keys = [];
-      this.ammo = 20;
-      this.ammoTimer = 0;
-      this.gameTime = 0;
-      this.gameOver = false;
-      this.score = 0;
-      this.enemies = [];
-      this.enemyTimer = 0;
-    }
     update(deltaTime) {
       if (!this.gameOver && !gamePaused) {
         this.gameTime += deltaTime;
@@ -463,8 +442,6 @@ window.addEventListener('load', function() {
       }
     }
   }
-  
-  
     draw(context){
       this.background.draw(context)
       this.ui.draw(context)
@@ -495,58 +472,55 @@ window.addEventListener('load', function() {
   }
 
   const game = new Game(canvas.width, canvas.height);
-let lastTime = 0;
+  let lastTime = 0;
 
-function animate(timeStamp) {
-  const deltaTime = timeStamp - lastTime;
-  lastTime = timeStamp;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  game.update(deltaTime);
-  game.draw(ctx);
-  if (gameStarted && !gamePaused) requestAnimationFrame(animate);
-}
-
-const startBtn = document.getElementById('startBtn');
-const stopBtn = document.getElementById('stopBtn');
-const resumeBtn = document.getElementById('resumeBtn');
-const rulesBtn = document.getElementById('rulesBtn');
-const rulesPopup = document.getElementById('rulesPopup');
-const closePopup = document.getElementById('closePopup');
-
-startBtn.addEventListener('click', () => {
-  game.reset(); // Reset the game state
-  if (!gameStarted) {
-    gameStarted = true;
-    animate(0); // Start the game loop
+  function animate(timeStamp) {
+    const deltaTime = timeStamp - lastTime;
+    lastTime = timeStamp;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    game.update(deltaTime);
+    game.draw(ctx);
+    if (gameStarted && !gamePaused) requestAnimationFrame(animate);
   }
-});
+  const startBtn = document.getElementById('startBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const resumeBtn = document.getElementById('resumeBtn');
+  const rulesBtn = document.getElementById('rulesBtn');
+  const rulesPopup = document.getElementById('rulesPopup');
+  const closePopup = document.getElementById('closePopup');
 
-stopBtn.addEventListener('click', () => {
-  gamePaused = true; // Stop the game loop
-});
+  startBtn.addEventListener('click', () => {
+    if (!gameStarted) {
+      gameStarted = true;
+      animate(0); // Start the game loop
+    }
+  });
 
-resumeBtn.addEventListener('click', () => {
-  if (gamePaused) {
-    gamePaused = false; 
-    requestAnimationFrame(animate); // Resume the game loop
-  }
-});
+  stopBtn.addEventListener('click', () => {
+    gamePaused = true; // Stop the game loop
+  });
 
-rulesBtn.addEventListener('click', () => {
-  rulesPopup.style.display = 'block'; // Show rules popup
-});
+  resumeBtn.addEventListener('click', () => {
+    if (gamePaused) {
+      gamePaused = false; 
+      requestAnimationFrame(animate); // Resume the game loop
+    }
+  });
 
-closePopup.addEventListener('click', () => {
-  rulesPopup.style.display = 'none'; // Close rules popup
-});
+  rulesBtn.addEventListener('click', () => {
+    rulesPopup.style.display = 'block'; // Show rules popup
+  });
 
-window.addEventListener('click', (event) => {
-  if (event.target === rulesPopup) {
-    rulesPopup.style.display = 'none'; // Close popup if clicked outside
-  }
-});
+  closePopup.addEventListener('click', () => {
+    rulesPopup.style.display = 'none'; // Close rules popup
+  });
 
-animate(0);
-}) 
+  window.addEventListener('click', (event) => {
+    if (event.target === rulesPopup) {
+      rulesPopup.style.display = 'none'; // Close popup if clicked outside
+    }
+  });
+  animate(0);
+}); 
 
   
